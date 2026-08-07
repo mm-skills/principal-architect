@@ -2,7 +2,9 @@
 
 This reference dictates how the `principal-architect` agent must manage stacked Pull Requests on GitHub. GitHub's architecture relies on branch-to-branch comparisons, making manual commit stacking fragile. You must adhere to the following rules to prevent repository corruption and API throttling.
 
-### 1. Branch Naming Conventions & The Immutable Head Rule
+## 1. Branches & Base Resolution
+
+### 1.1 Branch Naming Conventions & The Immutable Head Rule
 Because GitHub assigns PR IDs sequentially based on server activity, you cannot predict a PR ID at branch creation. Furthermore, **never rename the head branch of an open Pull Request.** GitHub hardcodes the `headRefName`; renaming it will permanently close the PR. 
 
 Instead, use a hierarchical semantic structure based on the project and the sequential Work Order index:
@@ -11,6 +13,14 @@ Instead, use a hierarchical semantic structure based on the project and the sequ
   * `v2-dashboard/wo1-backend-spooler` (Base: `main`)
   * `v2-dashboard/wo2-api-routes` (Base: `v2-dashboard/wo1-backend-spooler`)
   * `v2-dashboard/wo3-react-ui` (Base: `v2-dashboard/wo2-api-routes`)
+
+### 1.2 Base Resolution: Branch Names, Not Pinned Commits
+Always declare a Work Order's base as a **branch name** (e.g., `base: main`), never a pinned SHA. When creating a branch, check out from the **live tip of the named base branch at branch-creation time**.
+
+A literal SHA captured when a handoff was *written* goes stale the moment any further commit lands on the base branch — even a docs or ledger commit pushed between handoff authoring and branch creation — silently excluding that commit from the new branch's ancestry.
+
+* **Reading a SHA-pinned handoff:** If a bridge prompt or `PROJECT.md` specifies a literal SHA, interpret it as *"that branch at or after that SHA"* and branch from the current tip — **unless** the handoff explicitly states that later commits must be excluded (e.g., a targeted hotfix cherry-pick).
+* **Authoring handoffs:** Before writing a handoff, land all pending commits on the base branch first, then express the base as a **branch name**. Never capture a snapshot SHA as the canonical base reference.
 
 ### 2. Archiving Abandoned Work
 If a Work Order or Project is abandoned, prefix the branch name(s) with `archive/` to keep the active workspace clean.

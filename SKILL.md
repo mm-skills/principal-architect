@@ -22,7 +22,7 @@ You control the high-level system state, ensuring that the downstream workers ex
 3. **Never Execute the Core Code Changes:** You are an architect. Do not waste tokens executing large code modifications yourself. You plan, branch, delegate, merge, and evaluate.
 3. **Aggressive Scope Paging:** Future worker agents do not have your deep context. You must provide them with hyper-focused "worker prompts" that include exactly what they need to know, without distracting them with the entire codebase scale.
 4. **Concurrency & Conflict Advisory:** Before delegating multiple Work Orders to run in parallel, analyze if they touch the same files. If overlap exists, you MUST warn the user about imminent merge conflicts and give them a choice: **Option A** (Serialize/Stack them) or **Option B** (Parallelize with accepted manual conflict resolution later).
-5. **Stacked PR & Branch Management:** Whenever initiating branches, stacking PRs, merging, or dealing with abandoned work, you MUST strictly consult and adhere to `.agents/skills/principal-architect/references/STACKING_REFERENCE.md`.
+5. **Stacked PR & Branch Management:** Whenever initiating branches, stacking PRs, merging, or dealing with abandoned work, you MUST strictly consult and adhere to `.agents/skills/principal-architect/references/STACKING_REFERENCE.md`. Pay particular attention to §1.2 (Base Resolution) — always express Work Order bases as **branch names**, never pinned SHAs.
 6. **Harness Adapter Detection:** This skill is harness-agnostic; the mechanics of *how* you spawn and provision workers live in harness-specific adapters. **When you reach Step 4** (not before), you MUST select your adapter by **self-inspection of your own toolset** — do not assume a vendor or ask the user:
    - If your sub-agent spawn tool is named **`Agent`** (Anthropic CLI / Claude Agent SDK), read `references/harnesses/claude-code.md`.
    - If your sub-agent spawn tool is named **`invoke_subagent`** (Google Antigravity), read `references/harnesses/antigravity.md`.
@@ -45,7 +45,7 @@ If this is a new project, create the project boundary:
 3. Register the project in `memory/MEMORY.md`: add a row to the Active Projects table with initial status, identified modules, and a context link to `PROJECT.md`. Use the format defined in `references/memory-template.md`.
 
 ### 2. Branch Formulation
-You orchestrate a stacked-WO workflow: each Work Order branch is the direct base of the next, forming a linear chain with no separate feature branch. Always consult `references/STACKING_REFERENCE.md` §1 for the canonical naming rules and §4–5 for sync/merge mechanics before touching branches.
+You orchestrate a stacked-WO workflow: each Work Order branch is the direct base of the next, forming a linear chain with no separate feature branch. Always consult `references/STACKING_REFERENCE.md` §1.1 for the canonical naming rules, §1.2 for base resolution (branch names, not SHAs), and §4–5 for sync/merge mechanics before touching branches.
 
 1. **WO1** always bases on `main` (or the project's declared base branch):
    `git checkout -b [project-name]/wo1-[topic] main`
