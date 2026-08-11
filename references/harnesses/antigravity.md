@@ -53,10 +53,20 @@ Do not use `manage_subagents` to poll for completion. Wait to be woken.
 ## Artifact-Write Authorization (not needed here)
 
 Unlike Claude Code, this runtime does **not** restrain workers from writing report-style `.md`
-files. Workers author their own WORKORDER status updates, ADRs, graveyard notes, and
-`@distillery` → `context_bridge.md` directly — this is the established pattern and the source of
-the existing distillations in this workspace. No special authorization block in the spawn prompt
-is required.
+files. Workers author their own WORKORDER status updates and Completion Reports directly —
+this is the established pattern. No special authorization block in the spawn prompt is required.
+
+## Spawn Prompt Format
+
+Construct the prompt for the sub-agent exactly like this:
+```markdown
+# [project-name] / WO[Y] - [topic]
+
+You are an expert senior software engineer and execution-focused worker agent. **DO NOT trigger or act as the principal-architect.** I need you to completely execute Work Order [Y].
+Read your exact strict-instruction manual here via view_file: `.agents/skills/principal-architect-workspace/pr-[project-name]/wo[Y]-[topic]/WORKORDER.md`
+
+Execute the checklist and verify your changes. Once finished, **STOP and send a message back to me** confirming the implementation is validated and noting any iteration needed. Do not wrap up until I explicitly approve the work. Once approved, append your Completion Report to the WORKORDER.md file (the template is at the bottom of your WORKORDER) and terminate your session.
+```
 
 ## Complexity → Model Mapping (The Efficiency Lever)
 
