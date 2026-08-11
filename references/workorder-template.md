@@ -13,7 +13,7 @@ Every WORKORDER.md must follow this structure. Copy the sections below into the 
 ---
 name: [project]-wo[Y]
 description: Handoff instructions for Work Order [Y]
-complexity: standard   # mechanical | standard | architect
+complexity: standard   # mechanical | standard | architect | interactive
 ---
 ```
 
@@ -21,6 +21,7 @@ The `complexity` field is mandatory and describes *the work*, not any specific m
 - **`mechanical`** — rote, near-zero judgment (mass rename, find/replace, doc/index regeneration, scaffolding boilerplate, run-verify-and-report).
 - **`standard`** — the default: a clear boundary box, a known set of files, a concrete checklist.
 - **`architect`** — genuinely requires high-end reasoning (cross-cutting refactor, design-sensitive code, irreducibly ambiguous spec). Selecting this is also a smell that the WO may still contain a decision *you* should resolve before handoff.
+- **`interactive`** — requires human-in-the-loop iteration (UI verification, manual QA, exploratory debugging). The PA provides a bridge prompt to the user rather than spawning an autonomous worker. See `references/debug-handoff.md` for the full protocol.
 
 ## Required Sections
 

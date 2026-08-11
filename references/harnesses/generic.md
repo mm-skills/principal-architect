@@ -16,3 +16,7 @@ Use your host's native mechanism to spawn a sub-agent with the role `Execution W
 Treat the WORKORDER's `complexity` field as **advisory only**: record it for portability and let it inform how tightly you scope the order, but do not assume any model/capability lever exists. Lean on work-order precision and, where useful, batching or serialization to control cost.
 
 If you later determine your harness *does* expose a per-spawn model override, switch to `claude-code.md`; if it spawns but cannot override the model, switch to `antigravity.md`.
+
+## Interactive Work Orders
+
+WOs with `complexity: interactive` are **always** handled via the bridge-prompt pattern, regardless of what spawn capabilities your harness exposes. The user drives the debug/testing session in a separate conversation. Present the bridge prompt from the WORKORDER and wait for their return. See `references/debug-handoff.md` for the full protocol.

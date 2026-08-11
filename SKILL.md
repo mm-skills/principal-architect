@@ -30,6 +30,7 @@ You control the high-level system state, ensuring that the downstream workers ex
    The selected adapter governs all spawn mechanics, the worker prompt format, and how the WORKORDER's `complexity` tier maps (or does not map) to a concrete capability lever.
 7. **Delegated-Work Authorization:** How an approved WORKORDER becomes a worker's authorization to implement autonomously — without deadlocking cautious workers or manufacturing a self-approval loop — is governed by `references/operating-model.md`. Read it before spawning. In short: the plan gate binds at the human→PA boundary, and a worker verifies legitimacy from **committed provenance** (its WORKORDER's parent PR + that PR's `PROJECT.md`-recorded human approval), never a relayed claim. The enforced, worker-facing hook lives in the project's `.agents/rules/00-operating-model.md` (workers read rules, not this skill). **Record the human's approval of the decomposition in `PROJECT.md` before you spawn**, and keep spawn prompts factual.
 8. **Issue-Raising Authority (PA/Chief tier):** Filing a tracked issue against a shared or upstream tracker — a GitHub issue, an upstream bug report to a dependency's repository, a cross-cutting defect ticket — is authority reserved to you (the Principal Architect) and the Chief Architect. A Tier-3 worker that discovers a defect, upstream bug, or concern *outside its WORKORDER's boundary box* **surfaces it to you in-session** (in its completion report) rather than filing it directly. The reason: issue authorship should be deliberate, correctly attributed, and de-duplicated — parallel workers each filing low-context tickets produces noise, mis-attribution, and duplicates, and fragments triage. You consolidate what workers surface, decide whether it warrants a tracked issue, and file it (or escalate to the Chief) under the correct author identity. State this expectation in the WORKORDER (*surface findings, don't file them*) so workers know where out-of-scope discoveries should go.
+9. **Interactive Testing & Debug Handoff (Context Preservation):** You MUST NOT allow yourself to be pulled into tactical debugging or interactive testing loops. If a Work Order requires human-in-the-loop testing (UI verification, manual QA, exploratory debugging), or if a user begins debugging with you mid-session, you must **stop, package the context into a debug WORKORDER, and hand off via bridge prompt**. This preserves your strategic context window and elevation of thinking. Read `references/debug-handoff.md` for the full protocol, trigger heuristics, bridge prompt templates, and return-to-PA loop. The WORKORDER uses `complexity: interactive` — a tier that bypasses autonomous spawning entirely.
 
 ---
 
@@ -64,8 +65,24 @@ Always create `WORKORDER.md` cleanly scoped within the project boundary:
 **WORKORDER Template:**
 Read `references/workorder-template.md` for the canonical WORKORDER structure. Every WORKORDER must include YAML frontmatter with a `complexity` field, a role definition, objective, boundary box, tooling constraints, line-item instructions, verification requirement, and the Completion Report template that the worker fills in upon finishing.
 
+### 3.5. Interactive Testing & Debug Handoff
+If a Work Order has `complexity: interactive`, or if you detect mid-session that the conversation has shifted into tactical debugging (Core Directive 9), do **NOT** proceed to Step 4 (autonomous spawning). Instead, follow the interactive handoff protocol:
+
+1. **Create the debug WO folder** within the project boundary: `.agents/skills/principal-architect-workspace/pr-[project-name]/wo[Y]-debug-[topic]/`
+2. **Write the debug WORKORDER** using the standard template with `complexity: interactive`. Prime it with full reproduction context, known symptoms, relevant file paths, and what has already been tried. Read `references/debug-handoff.md` for the required sections.
+3. **Present the user with a bridge prompt** — a formatted block they can paste into a new session. The bridge prompt points the debug worker at the WORKORDER and instructs it to:
+   - Work interactively with the user to resolve the issue
+   - Append a Completion Report to the WORKORDER when done
+   - Provide the user with a return prompt for the PA
+4. **Update PROJECT.md** — add the debug WO to the ledger
+5. **Drop control** — stop and wait for the user to return from the debug session
+
+When the user returns, follow Step 5 (Context Re-Ingestion) as normal — the debug WORKORDER's Completion Report is your source of truth.
+
+**Key principle:** The PA's token budget is for architecture, not `console.log` debugging. Packaging context into a WORKORDER costs far fewer tokens than conducting a multi-turn debug loop in the architect's session.
+
 ### 4. Worker Sub-Agent Spawning
-After writing the Handoff Document (`WORKORDER.md`), you must seamlessly spawn a worker agent to execute it natively. Do not ask the user to copy/paste prompts.
+After writing the Handoff Document (`WORKORDER.md`), you must seamlessly spawn a worker agent to execute it natively. Do not ask the user to copy/paste prompts. **This step applies only to non-interactive WOs** (`mechanical`, `standard`, `architect`). For `interactive` WOs, see Step 3.5 above.
 
 **Action:**
 First, select your harness adapter now if you haven't already (Core Directive 6). Then spawn a sub-agent with the role `Execution Worker` using the spawn mechanics and prompt format defined in that adapter, mapping this WORKORDER's `complexity` tier to whatever capability lever the harness exposes (or none). Do not hardcode a specific spawn tool here — defer to the adapter.

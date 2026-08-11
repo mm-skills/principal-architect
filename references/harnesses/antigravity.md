@@ -79,8 +79,20 @@ Map the WORKORDER's `complexity` field directly to the `Model` parameter on `inv
 | `mechanical` | `flash_lite` | Rote, deterministic work — fastest, cheapest tier. |
 | `standard`   | `flash` | **Default worker tier.** Strong at code, fast, far cheaper than Pro. |
 | `architect`  | `pro` | Reserve for WOs that genuinely need architect-grade reasoning. If you reach for this, first ask whether the ambiguity belongs back in *your* court before handoff. |
+| `interactive` | *(not spawned)* | Human-in-the-loop work — the PA provides a bridge prompt instead of spawning. See below. |
 
 The `Model` you pass MUST match the `complexity` recorded in the WORKORDER frontmatter, so the choice stays auditable in the durable artifact.
+
+### Interactive Work Orders (bridge-prompt handoff)
+
+WOs with `complexity: interactive` are **not spawned as subagents**. The user drives the session directly in a new conversation. This is the correct pattern for debugging, UI verification, manual QA, and any work requiring tight human-in-the-loop iteration.
+
+Instead of calling `invoke_subagent`, the PA:
+1. Writes the WORKORDER with full primed context (see `references/debug-handoff.md`)
+2. Presents the user with a formatted bridge prompt to paste into a new Antigravity session
+3. Drops control and waits for the user to return with the worker's Completion Report
+
+This preserves the PA's strategic context window — debugging detail stays in the worker's session, not the architect's.
 
 ### Advanced: Custom Agent Types via `define_subagent`
 

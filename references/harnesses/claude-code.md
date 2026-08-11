@@ -69,5 +69,21 @@ Map the WORKORDER's `complexity` field directly to the `model` parameter:
 | `mechanical` | `haiku` | Rote, deterministic work — fastest, cheapest tier. |
 | `standard`   | `sonnet` | **Default worker tier.** Strong at code, fast, far cheaper than Opus. |
 | `architect`  | `opus` | Reserve for WOs that genuinely need architect-grade reasoning. If you reach for this, first ask whether the ambiguity belongs back in *your* court before handoff. |
+| `interactive` | *(not spawned autonomously)* | Human-in-the-loop work — use `spawn_task` or provide a bridge prompt. See below. |
 
 The `model` you pass MUST match the `complexity` recorded in the WORKORDER frontmatter, so the choice stays auditable in the durable artifact.
+
+### Interactive Work Orders (bridge-prompt handoff)
+
+WOs with `complexity: interactive` are **never spawned autonomously** (`run_in_background: true`). The user drives the session directly. This is the correct pattern for debugging, UI verification, manual QA, and any work requiring tight human-in-the-loop iteration.
+
+Two options, in order of preference:
+1. **`spawn_task`** — surfaces a chip that opens a separate interactive session with its own worktree. The user drives the debug/testing work directly. This is the natural Claude Code mechanism for interactive handoffs.
+2. **Bridge prompt** — if `spawn_task` is unavailable or the user prefers, present a formatted bridge prompt the user can paste into a new session manually.
+
+In both cases, the PA:
+1. Writes the WORKORDER with full primed context (see `references/debug-handoff.md`)
+2. Hands off to the user and drops control
+3. Resumes when the user returns with the worker's Completion Report
+
+This preserves the PA's strategic context window — debugging detail stays in the worker's session, not the architect's.
