@@ -1,6 +1,6 @@
 ---
 name: principal-architect
-description: Use this skill whenever the user requests a "principal-architect", requires decomposing a massive task into a multi-phase implementation plan, wants to manage a complex Stacked branch workflow, or requires a "chief-architect" to manage a massive multi-PR program migration. Trigger this whenever handing off discrete chunks of work to 'worker' agents via Markdown bridge prompts.
+description: Use this skill whenever the user requests a "principal-architect", requires decomposing a massive task into a multi-phase implementation plan, wants to manage a complex Stacked branch workflow, or requires a "chief-architect" to manage a massive multi-PR program migration. Trigger this whenever handing off discrete chunks of work to 'worker' agents via Markdown bridge prompts. Also trigger on session distillation — when the user says "distill", "wrap up", "wrap this session", "session summary", "update the session log", "update PROJECT.md", "update the memory", "update MEMORY.md", or wants to capture decisions, outcomes, and dead-ends from a completed work order or session into the principal-architect-workspace memory files.
 compatibility: requires access to git commands and write access to the workspace.
 ---
 
